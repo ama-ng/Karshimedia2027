@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alh. Mahmood Dahiru Modibbo | APC 2027</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+    <style>
+        :root {
+            --apc-blue: #0056b3;
+            --apc-green: #28a745;
+            --apc-red: #dc3545;
+            --light: #f8f9fa;
+            --dark: #212529;
+        }
+
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; background: var(--light); color: var(--dark); }
+        header { background: var(--apc-blue); color: white; padding: 2rem 1rem; text-align: center; border-bottom: 5px solid var(--apc-green); }
+        nav { background: #fff; padding: 10px; display: flex; justify-content: center; gap: 15px; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        nav button { padding: 10px 20px; cursor: pointer; border: none; background: var(--apc-blue); color: white; border-radius: 5px; font-weight: bold; }
+
+        .container { max-width: 1000px; margin: 20px auto; padding: 20px; background: white; border-radius: 8px; }
+        .section { display: none; }
+        .active { display: block; }
+
+        /* Home Styles */
+        .hero-img { width: 250px; height: 250px; border-radius: 50%; object-fit: cover; border: 5px solid var(--apc-green); margin-bottom: 15px; }
+        .mission-box { background: #e9ecef; padding: 20px; border-radius: 10px; border-left: 5px solid var(--apc-blue); margin-top: 20px; }
+
+        /* Supporter List Styles */
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 14px; }
+        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+        th { background-color: var(--apc-blue); color: white; }
+        .ward-btns { display: flex; flex-wrap: wrap; gap: 5px; margin: 15px 0; }
+        .btn-sm { padding: 5px 10px; font-size: 12px; background: var(--apc-green); color: white; border: none; border-radius: 3px; cursor: pointer; }
+
+        /* Poster Creator Styles */
+        #canvas-container { position: relative; border: 2px dashed #ccc; margin-top: 20px; overflow: hidden; background: #eee; width: 100%; max-width: 500px; aspect-ratio: 1/1;}
+        canvas { width: 100%; cursor: move; }
+        .controls { display: grid; gap: 10px; margin-top: 15px; }
+        input, select { padding: 10px; border: 1px solid #ccc; border-radius: 4px; }
+
+        #admin-btn { display: none; margin-top: 20px; background: var(--apc-red); padding: 10px; color: white; text-align: center; cursor: pointer; border-radius: 5px; text-decoration: none; }
+        
+        footer { text-align: center; padding: 20px; font-size: 14px; color: #666; margin-top: 40px; border-top: 1px solid #ddd; }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Alh. Mahmood Dahiru Modibbo</h1>
+    <h3>Karshi Ribadu</h3>
+    <p>Candidate: Member House of Assembly 2027 | Fufore/Gurin Constituency | APC</p>
+</header>
+
+<nav>
+    <button onclick="showSection('home')">Home</button>
+    <button onclick="showSection('supporters')">Supporters</button>
+    <button onclick="showSection('poster')">Campaign Poster</button>
+</nav>
+
+<div class="container">
+    <section id="home" class="section active">
+        <center>
+            <img src="candidate.jpg" alt="Alh. Mahmood Dahiru Modibbo" class="hero-img" onerror="this.src='https://via.placeholder.com/250?text=Candidate+Image'">
+            <h2>The Mission</h2>
+        </center>
+        <div class="mission-box">
+            <p>To provide qualitative representation for the people of Fufore/Gurin through:</p>
+            <ul>
+                <li>Sustainable Agricultural Support Programs</li>
+                <li>Educational Infrastructure Development</li>
+                <li>Youth & Women Empowerment Initiatives</li>
+                <li>Transparent & Accessible Leadership</li>
+            </ul>
+        </div>
+    </section>
+
+    <section id="supporters" class="section">
+        <h2>Our Supporters</h2>
+        <div class="ward-btns">
+            <button class="btn-sm" onclick="loadSupporters('All')">Show All</button>
+            <script>
+                const wards = ["Beti", "Farang", "Fufore", "Gurin", "Karlahi", "Mayo_Ine", "Pariya", "Ribadu", "Uki_Tuki", "Wuro_Bokki", "Yadim"];
+                wards.forEach(w => {
+                    document.write(`<button class="btn-sm" onclick="loadSupporters('${w}')">${w}</button>`);
+                });
+            </script>
+        </div>
+        <div style="overflow-x: auto;">
+            <table id="supporterTable">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Ward</th>
+                        <th>Town</th>
+                        <th>Facebook</th>
+                        <th>Phone</th>
+                    </tr>
+                </thead>
+                <tbody id="supporterBody">
+                    <tr><td colspan="5">Loading supporters...</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <a id="admin-btn" href="#">Download CSV (Admin Only)</a>
+    </section>
+
+    <section id="poster" class="section">
+        <h2>Digital Campaign Poster Generator</h2>
+        <p>Create your personalized campaign poster and share with your network!</p>
+        
+        <div class="controls">
+            <input type="text" id="pName" placeholder="Enter Your Full Name" oninput="drawPoster()">
+            <select id="pWard" onchange="changeWardTemplate()">
+                <option value="">Select Your Ward</option>
+                <script>
+                    wards.forEach(w => document.write(`<option value="${w}">${w}</option>`));
+                </script>
+            </select>
+            <input type="text" id="pTown" placeholder="Enter Your Town" oninput="drawPoster()">
+            <label>Upload Your Photo:</label>
+            <input type="file" id="pImg" accept="image/*" onchange="handleUserImage(event)">
+        </div>
+
+        <div id="canvas-container">
+            <canvas id="posterCanvas" width="800" height="800"></canvas>
+        </div>
+        
+        <div class="controls">
+            <button onclick="downloadPoster()" style="background: var(--apc-green); color: white; padding: 15px; border: none; font-size: 18px; border-radius: 5px; cursor: pointer;">Download Poster</button>
+            <p><small>* Use mouse/touch to drag your photo and text to the perfect position.</small></p>
+        </div>
+    </section>
+</div>
+
+<footer>
+    &copy; 2026 Karshi Media. All Rights Reserved.
+</footer>
+
+<script>
+    // --- CONFIGURATION ---
+    const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vReouyl2COvHwLhnejKIhawN_NhMoe9hdJK7K2EgOvLd16Qie016yFoTE4X8KnjzZ5n93PKrj7ZWbsS/pub?gid=655142656&single=true&output=csv';
+    const ADMIN_KEY = '123';
+    
+    // --- NAVIGATION ---
+    function showSection(id) {
+        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        if(id === 'supporters') fetchSupporters();
+    }
+
+    // --- ADMIN CHECK ---
+    const urlParams = new URLSearchParams(window.location.search);
+    if(urlParams.get('admin') === ADMIN_KEY) {
+        document.getElementById('admin-btn').style.display = 'block';
+    }
+
+    // --- SUPPORTERS LOGIC ---
+    let allSupporters = [];
+    async function fetchSupporters() {
+        try {
+            const response = await fetch(CSV_URL);
+            const data = await response.text();
+            Papa.parse(data, {
+                header: true,
+                complete: (results) => {
+                    allSupporters = results.data;
+                    loadSupporters('All');
+                    setupAdminDownload(data);
+                }
+            });
+        } catch (e) {
+            console.error("Error loading CSV", e);
+        }
+    }
+
+    function loadSupporters(ward) {
+        const body = document.getElementById('supporterBody');
+        body.innerHTML = "";
+        const filtered = ward === 'All' ? allSupporters : allSupporters.filter(s => s.Ward === ward);
+        
+        filtered.forEach(s => {
+            if(!s.Name) return;
+            body.innerHTML += `<tr>
+                <td>${s.Name}</td>
+                <td>${s.Ward}</td>
+                <td>${s.Town}</td>
+                <td><a href="${s['Facebook Url link']}" target="_blank">View Profile</a></td>
+                <td>${s['Phone Number']}</td>
+            </tr>`;
+        });
+    }
+
+    function setupAdminDownload(csvData) {
+        const blob = new Blob([csvData], { type: 'text/csv' });
+        const url = window.URL.createObjectURL(blob);
+        document.getElementById('admin-btn').href = url;
+        document.getElementById('admin-btn').download = 'Supporters_List.csv';
+    }
+
+    // --- POSTER GENERATOR LOGIC ---
+    const canvas = document.getElementById('posterCanvas');
+    const ctx = canvas.getContext('2d');
+    let templateImg = new Image();
+    let userImg = new Image();
+    
+    // Object positions
+    let userPhotoPos = { x: 500, y: 400, w: 250, h: 300 };
+    let textPos = { nameX: 100, nameY: 700, wardY: 740, townY: 770 };
+    let isDragging = false;
+
+    function changeWardTemplate() {
+        const ward = document.getElementById('pWard').value;
+        if(ward) {
+            // Assumes images are named 'Beti.jpg', 'Gurin.jpg' etc in your folder
+            templateImg.src = `${ward}.jpg`; 
+            templateImg.onload = drawPoster;
+        }
+    }
+
+    function handleUserImage(e) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            userImg.src = event.target.result;
+            userImg.onload = drawPoster;
+        };
+        reader.readAsDataURL(e.target.files[0]);
+    }
+
+    function drawPoster() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        // 1. Draw Template
+        if(templateImg.complete && templateImg.src) {
+            ctx.drawImage(templateImg, 0, 0, 800, 800);
+        } else {
+            ctx.fillStyle = "#ccc";
+            ctx.fillRect(0,0,800,800);
+            ctx.fillStyle = "#000";
+            ctx.fillText("Select Ward Template", 300, 400);
+        }
+
+        // 2. Draw User Photo
+        if(userImg.complete && userImg.src) {
+            ctx.drawImage(userImg, userPhotoPos.x, userPhotoPos.y, userPhotoPos.w, userPhotoPos.h);
+        }
+
+        // 3. Draw Text
+        ctx.fillStyle = "white"; // Adjust color based on design
+        ctx.font = "bold 30px Arial";
+        ctx.fillText(document.getElementById('pName').value, textPos.nameX, textPos.nameY);
+        ctx.font = "24px Arial";
+        ctx.fillText("Ward: " + document.getElementById('pWard').value, textPos.nameX, textPos.wardY);
+        ctx.fillText("Town: " + document.getElementById('pTown').value, textPos.nameX, textPos.townY);
+    }
+
+    // Drag and Drop Logic
+    canvas.onmousedown = (e) => { isDragging = true; };
+    canvas.onmouseup = () => { isDragging = false; };
+    canvas.onmousemove = (e) => {
+        if(isDragging) {
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            userPhotoPos.x = (e.clientX - rect.left) * scaleX - (userPhotoPos.w / 2);
+            userPhotoPos.y = (e.clientY - rect.top) * scaleY - (userPhotoPos.h / 2);
+            drawPoster();
+        }
+    };
+
+    function downloadPoster() {
+        const link = document.createElement('a');
+        link.download = `Campaign_Poster_${document.getElementById('pName').value}.png`;
+        link.href = canvas.toDataURL();
+        link.click();
+    }
+
+    // Initial Load
+    window.onload = () => {
+        templateImg.src = ""; // Placeholder
+        drawPoster();
+    };
+</script>
+
+</body>
+</html>
